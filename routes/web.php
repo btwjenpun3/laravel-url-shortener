@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LinkController;
+use App\Http\Controllers\RedirectUrlController;
+use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,5 +35,23 @@ Route::prefix('/links')
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
         Route::post('/{id}', 'edit')->name('edit');
+        Route::get('/download/{url}', 'download')->name('download');
+        Route::post('/password/{id}', 'password')->name('password');
+        Route::delete('/password/{id}', 'removePassword');
         Route::delete('/{id}', 'destroy')->name('destroy');
+    });
+
+Route::prefix('/setting')
+    ->name('setting.')
+    ->controller(SettingController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+    });
+
+Route::prefix('/')
+    ->name('redirect.')
+    ->controller(RedirectUrlController::class)
+    ->group(function () {
+        Route::get('/{url}', 'redirect')->name('index');
+        Route::get('/unlock/{id}', 'unlockPassword')->name('password');
     });

@@ -18,11 +18,13 @@
     <div class="collapse" id="collapseMore">
         <div class="card card-body">
             <x-adminlte-input name="title" label="Title (Optional)" id="title" igroup-size="lg" />
+            <x-adminlte-input type="password" name="title" label="Password (Optional)" id="setPassword"
+                igroup-size="lg" />
         </div>
     </div>
 
-    <div id="create_link"></div>
-    <div id="edit_success"></div>
+    <div id="success"></div>
+    <div id="error"></div>
 
     <div id="contents">
         @if ($links->isEmpty())
@@ -40,24 +42,33 @@
                         <div class="col-md-6 d-flex">
                             <div class="ml-auto">
                                 <x-adminlte-button label="Share" theme="primary" icon="fas fa-share" />
-                                <x-adminlte-button label="Edit" theme="secondary" icon="fas fa-edit" data-toggle="modal"
-                                    data-target="#editModal{{ $link->id }}" />
+                                <x-adminlte-button theme="outline-primary" icon="fas fa-qrcode" data-toggle="modal"
+                                    data-target="#qrModal{{ $link->id }}" />
+                                <x-adminlte-button label="Edit" theme="outline-primary" icon="fas fa-edit"
+                                    data-toggle="modal" data-target="#editModal{{ $link->id }}" />
                             </div>
                         </div>
                     </div>
-
                     <x-slot name="footerSlot">
                         <div class="row">
                             <div class="col-md-4">
-                                <i class="fa fa-folder"></i> {{ $link->created_at }}
+                                <i class="far fa-folder"></i>
+                                {{ Carbon\Carbon::parse($link->created_at)->format('d M Y H:i') }}
                             </div>
                             <div class="col-md-8">
                                 <div class="d-flex">
                                     <div class="ml-auto">
                                         <x-adminlte-button class="btn-sm" theme="outline-secondary" label="Set Time"
                                             icon="fas fa-clock" />
-                                        <x-adminlte-button class="btn-sm" theme="outline-secondary" label="Set Password"
-                                            icon="fas fa-lock" />
+                                        @if (isset($link->password))
+                                            <x-adminlte-button class="btn-sm" theme="outline-primary" label="Locked"
+                                                icon="fas fa-lock" data-toggle="modal"
+                                                data-target="#passwordModal{{ $link->id }}" />
+                                        @else
+                                            <x-adminlte-button class="btn-sm" theme="outline-secondary" label="Set Password"
+                                                icon="fas fa-unlock" data-toggle="modal"
+                                                data-target="#passwordModal{{ $link->id }}" />
+                                        @endif
                                         <x-adminlte-button id="delete{{ $link->id }}" class="btn-sm delete-button"
                                             theme="outline-danger" label="Delete" onclick="hapus({{ $link->id }})"
                                             icon="fas fa-trash" />
@@ -67,39 +78,9 @@
                         </div>
                     </x-slot>
                 </x-adminlte-card>
-
-                <x-adminlte-modal id="editModal{{ $link->id }}" title="Edit" icon="fas fa-edit" size='lg'
-                    theme="primary">
-                    <div id="edit_fail"></div>
-                    <h5>Title (Optional)</h5>
-                    <x-adminlte-input type="text" id="edited_title{{ $link->id }}" name="edited_title"
-                        placeholder="{{ $link->title }}" value="{{ $link->title }}" igroup-size="lg">
-                    </x-adminlte-input>
-                    <h5>Short URL</h5>
-                    <x-adminlte-input type="text" id="edited_short_url{{ $link->id }}" name="edited_short_url"
-                        placeholder="{{ $link->short_url }}" value="{{ $link->short_url }}" igroup-size="lg">
-                        <x-slot name="prependSlot">
-                            <div class="input-group-text">
-                                {{ env('APP_URL') }}
-                            </div>
-                        </x-slot>
-                        <x-slot name="bottomSlot">
-                            <span class="text-sm text-gray">
-                                <i class="fas fa-info-circle"></i> Changing links also changing QR Code information.
-                            </span>
-                        </x-slot>
-                    </x-adminlte-input>
-                    <h5>Original URL</h5>
-                    <x-adminlte-input type="text" id="edited_original_url{{ $link->id }}" name="edited_original_url"
-                        placeholder="{{ $link->original_url }}" value="{{ $link->original_url }}" igroup-size="lg"
-                        readonly>
-                    </x-adminlte-input>
-                    <x-slot name="footerSlot">
-                        <x-adminlte-button class="ml-auto" theme="danger" label="Dismiss" data-dismiss="modal" />
-                        <x-adminlte-button id="edit" class="edit-button" theme="primary" label="Save"
-                            onclick="edit({{ $link->id }})" />
-                    </x-slot>
-                </x-adminlte-modal>
+                @include('link.modals.password')
+                @include('link.modals.qr')
+                @include('link.modals.edit')
             @endforeach
             {{ $links->links() }}
         @endif
@@ -117,6 +98,7 @@
                 data: {
                     'title': $('#title').val(),
                     'link': $('#link').val(),
+                    'password': $('#setPassword').val(),
                     '_token': csrfToken
                 },
                 success: function(response) {
@@ -124,17 +106,20 @@
                     successMessage.className = "alert alert-success";
                     successMessage.textContent = response.success;
                     $('#contents').load(' #contents');
-                    $('#create_link').html(successMessage);
+                    $('#success').html(successMessage);
                     setTimeout(function() {
                         successMessage.remove();
                     }, 5000);
+                    $("#link").val('');
+                    $("#title").val('');
+                    $("#setPassword").val('');
                     return false;
                 },
                 error: function(xhr, error, status) {
                     var errorMessage = document.createElement("div");
                     errorMessage.className = "alert alert-danger";
                     errorMessage.textContent = xhr.responseJSON.message;
-                    $('#create_link').html(errorMessage);
+                    $('#error').html(errorMessage);
                     setTimeout(function() {
                         errorMessage.remove();
                     }, 5000);
@@ -195,7 +180,7 @@
                     successMessage.className =
                         "alert alert-success";
                     successMessage.textContent = response.success;
-                    $('#edit_success').html(successMessage);
+                    $('#success').html(successMessage);
                     $('#editModal' + id).modal('hide');
                     $('#contents').load(' #contents');
                     setTimeout(function() {
@@ -207,7 +192,81 @@
                         "div");
                     errorMessage.className = "alert alert-danger";
                     errorMessage.textContent = xhr.responseJSON.message;
-                    $('#edit_fail').html(errorMessage);
+                    $('#invalid' + id).html(errorMessage);
+                    console.log(errorMessage);
+                    setTimeout(function() {
+                        errorMessage.remove();
+                    }, 5000);
+                    return false;
+                }
+            });
+        };
+
+        function password(id) {
+            $.ajax({
+                url: '/links/password/' + id,
+                method: 'POST',
+                data: {
+                    id: id,
+                    password: $('#password' + id).val(),
+                    _token: csrfToken
+                },
+                success: function(response) {
+                    var successMessage = document.createElement(
+                        "div");
+                    successMessage.className =
+                        "alert alert-success";
+                    successMessage.textContent = response.success;
+                    $('#success').html(successMessage);
+                    $('#passwordModal' + id).modal('hide');
+                    $('#contents').load(' #contents');
+                    setTimeout(function() {
+                        successMessage.remove();
+                    }, 5000);
+                },
+                error: function(xhr, status, error) {
+                    var errorMessage = document.createElement(
+                        "div");
+                    errorMessage.className = "alert alert-danger";
+                    errorMessage.textContent = xhr.responseJSON.message;
+                    $('#error' + id).html(errorMessage);
+                    setTimeout(function() {
+                        errorMessage.remove();
+                    }, 5000);
+                }
+            });
+        };
+
+        function removePassword(id) {
+            $.ajax({
+                url: '/links/password/' + id,
+                method: 'DELETE',
+                data: {
+                    id: id,
+                    _token: csrfToken
+                },
+                success: function(response) {
+                    var successMessage = document.createElement(
+                        "div");
+                    successMessage.className =
+                        "alert alert-success";
+                    successMessage.textContent = response.success;
+                    $('#success').html(successMessage);
+                    $('#passwordModal' + id).modal('hide');
+                    $('#contents').load(' #contents');
+                    setTimeout(function() {
+                        successMessage.remove();
+                    }, 5000);
+                },
+                error: function(xhr, status, error) {
+                    var errorMessage = document.createElement(
+                        "div");
+                    errorMessage.className = "alert alert-danger";
+                    errorMessage.textContent = xhr.responseJSON.message;
+                    $('#error' + id).html(errorMessage);
+                    setTimeout(function() {
+                        errorMessage.remove();
+                    }, 5000);
                 }
             });
         };

@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'AdminLTE 3',
+    'title' => 'Laravel URL Shortener',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -309,7 +309,7 @@ return [
         [
             'text'        => 'Dashboard',
             'route'         => 'dashboard.index',
-            'icon'        => 'far fa-fw fa-file'
+            'icon'        => 'fas fa-fw fa-home'
         ],
         [
             'text' => 'Links',
@@ -317,9 +317,9 @@ return [
             'icon' => 'fas fa-fw fa-link'
         ],
         [
-            'text' => 'profile',
-            'url'  => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
+            'text' => 'Settings',
+            'route'  => 'setting.index',
+            'icon' => 'fas fa-fw fa-cogs',
         ],
              
         // [
@@ -480,6 +480,16 @@ return [
                     'type' => 'js',
                     'asset' => false,
                     'location' => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js',
+                ],
+            ],
+        ],
+        'BootstrapSwitch' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/bootstrap-switch/js/bootstrap-switch.min.js',
                 ],
             ],
         ],
