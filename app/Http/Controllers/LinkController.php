@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Link;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Crypt;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class LinkController extends Controller
 {
     public function index() {
-        $links = Link::latest()->paginate(5);
+        $links = Link::where('user_id', auth()->id())->latest()->paginate(5);
         return view('link.index', [
             'links' => $links
         ]);
@@ -26,7 +27,7 @@ class LinkController extends Controller
             $time = Carbon::now();
             $crypt = Crypt::encryptString($time);
             $data = [
-                'user_id' => 1,
+                'user_id' => auth()->id(),
                 'title' => $request->title,
                 'original_url' => $request->link,
                 'short_url' => substr($crypt, 30, 6),
@@ -45,7 +46,12 @@ class LinkController extends Controller
     public function edit(Request $request) {
         $validate = $request->validate([
             'title' => 'max:100',
-            'short_url' => 'required|max:100|regex:/^[A-Za-z0-9-]+$/|unique:links,short_url',
+            'short_url' => [
+                'required',
+                'max:100',
+                Rule::unique('links', 'short_url')->ignore($request->id),
+                'regex:/^[A-Za-z0-9-]+$/'
+            ],
             'original_url' => 'required'
         ]);
         if($validate){

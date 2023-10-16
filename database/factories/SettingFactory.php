@@ -17,8 +17,8 @@ class SettingFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => 'redirect-page',
-            'value' => '0'
+            'name' => 'redirect_page',
+            'value' => 'true'
         ];
     }
 }

@@ -17,12 +17,12 @@ class RedirectUrlController extends Controller
                 'short_url' => $url->short_url
             ]);
         }
-        elseif($redirect_page->value == '1') {
+        elseif($redirect_page->value == 'true') {
             return view('redirect.index', [
                 'link' => $url->original_url
             ]);
         }
-        elseif($redirect_page->value == '0') {
+        elseif($redirect_page->value == 'false') {
             return redirect($url->original_url);
         }
         else {

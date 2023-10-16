@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LinkController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RedirectUrlController;
 use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
+use JeroenNoten\LaravelAdminLte\View\Components\Widget\ProfileColItem;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,13 +21,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::prefix('/auth')
+    ->name('auth.')
+    ->controller(AuthController::class)
+    ->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::post('/login', 'login')->name('login');
+        Route::post('/logout', 'logout')->name('logout');
+    });
+
 Route::get('/', function () {
     return view('main.index');
-});
+})->middleware('auth');
 
 Route::prefix('/dashboard')
     ->name('dashboard.')
     ->controller(DashboardController::class)
+    ->middleware('auth')
     ->group(function() {
         Route::get('/', 'index')->name('index');
     });
@@ -31,6 +45,7 @@ Route::prefix('/dashboard')
 Route::prefix('/links')
     ->name('link.')
     ->controller(LinkController::class)
+    ->middleware('auth')
     ->group(function() {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
@@ -41,11 +56,29 @@ Route::prefix('/links')
         Route::delete('/{id}', 'destroy')->name('destroy');
     });
 
+Route::prefix('/profile')
+    ->name('profile.')
+    ->controller(ProfileController::class)
+    ->middleware('auth')
+    ->group(function() {
+        Route::get('/', 'index')->name('index');        
+    }); 
+
+Route::prefix('/api')
+    ->name('api.')
+    ->controller(ApiController::class)
+    ->middleware('auth')
+    ->group(function() {
+        Route::post('/', 'generate')->name('generate');
+    }); 
+
 Route::prefix('/setting')
     ->name('setting.')
     ->controller(SettingController::class)
+    ->middleware('auth')
     ->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::post('/', 'update');
     });
 
 Route::prefix('/')
