@@ -21,7 +21,7 @@ class ApiController extends Controller
         ]);
         return response()->json([
             'success' => 'API Key successfully created.'
-        ]);
+        ], 200);
     }    
 
     public function get() {

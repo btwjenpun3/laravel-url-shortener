@@ -52,6 +52,8 @@ Route::prefix('/links')
         Route::post('/{id}', 'edit')->name('edit');
         Route::get('/download/{url}', 'download')->name('download');
         Route::post('/password/{id}', 'password')->name('password');
+        Route::post('/time/{id}', 'time')->name('time');
+        Route::delete('/time/{id}', 'removeTime');
         Route::delete('/password/{id}', 'removePassword');
         Route::delete('/{id}', 'destroy')->name('destroy');
     });

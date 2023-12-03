@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('original_url');
             $table->string('short_url');
             $table->string('password')->nullable();
+            $table->datetime('time')->nullable();
             $table->boolean('status');
             $table->timestamps();
         });

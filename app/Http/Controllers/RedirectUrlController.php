@@ -9,11 +9,21 @@ use App\Models\Setting;
 class RedirectUrlController extends Controller
 {
     public function redirect(Request $request) {
-        $url = Link::where('short_url', $request->url)->first(); 
-        $redirect_page = Setting::where('name', 'redirect_page')->first();       
+        $url            = Link::where('short_url', $request->url)->first(); 
+        $redirect_page  = Setting::where('name', 'redirect_page')->first();   
+        if(isset($url->time)) {
+            $timeRemaining = new LinkController();
+            $checkTime = $timeRemaining->timeRemaining($url->id, $url->time);
+            if($checkTime == 'Expired') {
+                return view('time.index', [
+                    'short_url' => $url->short_url
+                ]);
+            }
+        }
+
         if(isset($url->password)) {
             return view('password.index', [
-                'id' => $url->id,
+                'id'        => $url->id,
                 'short_url' => $url->short_url
             ]);
         }

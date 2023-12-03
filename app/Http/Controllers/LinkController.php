@@ -45,12 +45,12 @@ class LinkController extends Controller
 
     public function edit(Request $request) {
         $validate = $request->validate([
-            'title' => 'max:100',
+            'title'     => 'max:20',
             'short_url' => [
-                'required',
-                'max:100',
-                Rule::unique('links', 'short_url')->ignore($request->id),
-                'regex:/^[A-Za-z0-9-]+$/'
+                    'required',
+                    'max:20',
+                    Rule::unique('links', 'short_url')->ignore($request->id),
+                    'regex:/^[A-Za-z0-9-]+$/'
             ],
             'original_url' => 'required'
         ]);
@@ -62,7 +62,7 @@ class LinkController extends Controller
             ]);
             return response()->json([
                 'success' => 'Shortlink successfully edited'
-            ]);
+            ], 200);
         }        
     }
 
@@ -76,8 +76,55 @@ class LinkController extends Controller
             ]);
             return response()->json([
                 'success' => 'Password successfully set'
-            ]);
+            ], 200);
         }       
+    }
+
+    public function time(Request $request) {
+        $validate = $request->validate([
+            'time' => 'max:255|required'
+        ]);
+        if($validate) {
+            Link::where('id', $request->id)->update([
+                'time' => $request->time
+            ]);
+            return response()->json([
+                'success' => 'Time successfully set'
+            ], 200);
+        }       
+    }
+
+    public function timeRemaining($id, $time) {
+        $currentTime        = Carbon::now();
+        $convertCurrentTime = Carbon::parse($currentTime);
+        $linkTime           = Link::where('id', $id)->first();
+        $convertLinkTime    = Carbon::parse($linkTime->time);
+        $diffInSeconds      = $convertCurrentTime->diffInSeconds($convertLinkTime);
+        $diffInMinutes      = $convertCurrentTime->diffInMinutes($convertLinkTime);
+        $diffInHours        = $convertCurrentTime->diffInHours($convertLinkTime);
+        $diffInDays        = $convertCurrentTime->diffInDays($convertLinkTime);
+        if ($convertLinkTime->isPast()) {
+            return 'Expired';
+        }
+
+        if($diffInSeconds <= 60) {
+            return 'in ' . $diffInSeconds . ' seconds';
+        } elseif ($diffInSeconds >= 60 && $diffInSeconds <= 3600) {
+            return 'in ' . $diffInMinutes . ' minutes';
+        } elseif ($diffInSeconds >= 3600 && $diffInSeconds <= 86400) {
+            return 'in ' . $diffInHours . ' hours';
+        } elseif ($diffInSeconds >= 86400) {
+            return 'in ' . $diffInDays . ' days';
+        }
+    }
+
+    public function removeTime(Request $request) {
+        Link::where('id', $request->id)->update([
+            'time' => null
+        ]);
+        return response()->json([
+            'success' => 'Time successfully removed'
+        ], 200);
     }
 
     public function removePassword(Request $request) {
@@ -85,8 +132,8 @@ class LinkController extends Controller
             'password' => null
         ]);
         return response()->json([
-            'success' => 'Password successfully remove'
-        ]);
+            'success' => 'Password successfully removed'
+        ], 200);
     }
 
     public function destroy(Request $request) {        
