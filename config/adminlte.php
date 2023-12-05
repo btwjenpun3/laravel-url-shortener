@@ -291,21 +291,21 @@ return [
 
     'menu' => [
         // Navbar items:
-        [
-            'type'         => 'navbar-search',
-            'text'         => 'search',
-            'topnav_right' => true,
-        ],
+        // [
+        //     'type'         => 'navbar-search',
+        //     'text'         => 'search',
+        //     'topnav_right' => true,
+        // ],
         [
             'type'         => 'fullscreen-widget',
             'topnav_right' => true,
         ],
 
         // Sidebar items:
-        [
-            'type' => 'sidebar-menu-search',
-            'text' => 'search',
-        ],        
+        // [
+        //     'type' => 'sidebar-menu-search',
+        //     'text' => 'search',
+        // ],        
         [
             'text'        => 'Dashboard',
             'route'         => 'dashboard.index',
@@ -326,7 +326,13 @@ return [
             'can' => 'admin-only',
         ],
         [
-            'text' => 'Settings',
+            'text' => 'Users',
+            'route'  => 'users.index',
+            'can' => 'admin-only',
+            'icon' => 'fas fa-fw fa-server',
+        ], 
+        [
+            'text' => 'Site Settings',
             'route'  => 'setting.index',
             'can' => 'admin-only',
             'icon' => 'fas fa-fw fa-cogs',
@@ -424,22 +430,32 @@ return [
 
     'plugins' => [
         'Datatables' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js',
+                    'location' => '//cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js',
                 ],
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js',
+                    'location' => '//cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js',
+                ],
+                // [
+                //     'type' => 'js',
+                //     'asset' => false,
+                //     'location' => '//cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js',
+                // ],
+                [
+                    'type' => 'css',
+                    'asset' => false,
+                    'location' => '//cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css',
                 ],
                 [
                     'type' => 'css',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css',
+                    'location' => '//cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css',
                 ],
             ],
         ],

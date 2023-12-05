@@ -1,13 +1,14 @@
 <?php
 
-use App\Http\Controllers\Api\ApiController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\LinkController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RedirectUrlController;
-use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LinkController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\RedirectUrlController;
 use JeroenNoten\LaravelAdminLte\View\Components\Widget\ProfileColItem;
 
 /*
@@ -63,15 +64,19 @@ Route::prefix('/profile')
     ->controller(ProfileController::class)
     ->middleware('auth')
     ->group(function() {
-        Route::get('/', 'index')->name('index');        
+        Route::get('/', 'index')->name('index');  
+        Route::post('/edit/{id}', 'editProfile')->name('editProfile');
+        Route::post('/edit/password/{id}', 'editPassword')->name('editPassword');         
     }); 
 
-Route::prefix('/api')
+Route::prefix('/generate')
     ->name('api.')
     ->controller(ApiController::class)
     ->middleware('auth')
     ->group(function() {
-        Route::post('/', 'generate')->name('generate');
+        Route::post('/api', 'generate')->name('generate');
+        Route::post('/api/regenerate', 'regenerate');
+        Route::delete('/api/revoke', 'revoke');
     }); 
 
 Route::prefix('/setting')
@@ -81,6 +86,15 @@ Route::prefix('/setting')
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'update');
+    });
+
+Route::prefix('/users')
+    ->name('users.')
+    ->controller(UserController::class)
+    ->middleware('auth')
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/datatables', 'userDataTable')->name('userDataTable');
     });
 
 Route::prefix('/')
