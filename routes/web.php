@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LinkController;
@@ -74,9 +75,9 @@ Route::prefix('/generate')
     ->controller(ApiController::class)
     ->middleware('auth')
     ->group(function() {
-        Route::post('/api', 'generate')->name('generate');
-        Route::post('/api/regenerate', 'regenerate');
-        Route::delete('/api/revoke', 'revoke');
+        Route::post('/api/{id}', 'generate')->name('generate');
+        Route::post('/api/regenerate/{id}', 'regenerate');
+        Route::delete('/api/revoke/{id}', 'revoke');
     }); 
 
 Route::prefix('/setting')
@@ -95,7 +96,19 @@ Route::prefix('/users')
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/datatables', 'userDataTable')->name('userDataTable');
+        Route::get('/detail/{id}', 'detail')->name('detail');
+        Route::post('/edit/{id}', 'editUser');
+        Route::get('/delete/{id}', 'delete')->name('delete');
     });
+
+Route::prefix('/activity')
+    ->name('activity.')
+    ->controller(ActivityController::class)
+    ->middleware('auth') 
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/datatables', 'activityDataTable')->name('activityDataTable');
+    });   
 
 Route::prefix('/')
     ->name('redirect.')

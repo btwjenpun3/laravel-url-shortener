@@ -332,6 +332,12 @@ return [
             'icon' => 'fas fa-fw fa-server',
         ], 
         [
+            'text' => 'Activity Log',
+            'route'  => 'activity.index',
+            'can' => 'admin-only',
+            'icon' => 'fas fa-fw fa-file',
+        ],
+        [
             'text' => 'Site Settings',
             'route'  => 'setting.index',
             'can' => 'admin-only',

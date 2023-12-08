@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Link;
+use App\Models\User;
 use App\Models\ApiKey;
 use Laravel\Passport\Passport;
 use Illuminate\Support\Facades\Crypt;
@@ -12,12 +13,13 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class ApiController extends Controller
 {
-    public function generate() {
-        $user       = auth()->user();
+    public function generate(Request $request) {
+        $id         = $request->id;
+        $user       = User::where('id', $id)->first(); 
         $token_name = 'API-Token';
         $token      = $user->createToken($token_name);
         ApiKey::create([
-            'user_id' => auth()->id(),
+            'user_id' => $id,
             'key' => $token->plainTextToken
         ]);
         return response()->json([
@@ -25,13 +27,13 @@ class ApiController extends Controller
         ], 200);
     }    
 
-    public function regenerate() {
-        $user           = auth()->user();          
+    public function regenerate(Request $request) {
+        $id             = $request->id;
+        $user           = User::where('id', $id)->first();          
         $token_name     = 'API-Token'; 
-        $user->tokens()->delete();
-        $accessTokens   = $user->tokens;                  
+        $user->tokens()->delete();                 
         $token          = $user->createToken($token_name);        
-        ApiKey::where('user_id', $user->id)->update([
+        ApiKey::where('user_id', $id)->update([
             'key' => $token->plainTextToken
         ]);
         return response()->json([
@@ -39,11 +41,12 @@ class ApiController extends Controller
         ], 200);
     }
 
-    public function revoke() {
-        $user = auth()->user();
+    public function revoke(Request $request) {
+        $id     = $request->id;
+        $user   = User::where('id', $id)->first();
         $revoke = $user->tokens()->delete();
         if($revoke) {
-            ApiKey::where('user_id', auth()->id())->delete();
+            ApiKey::where('user_id', $id)->delete();
         }
         return response()->json([
             'success' => 'API Key successfully revoked.'

@@ -11,6 +11,8 @@
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
                                 <th>Created</th>
                                 <th>#</th>
                             </tr>
@@ -45,13 +47,39 @@
                         name: 'email'
                     },
                     {
+                        data: 'role_id',
+                        render: function(data) {
+                            if (data == 1) {
+                                return '<span class="badge bg-warning">Admin</span>';
+                            } else if (data == 2) {
+                                return '<span class="badge bg-primary">Member</span>';
+                            }
+                        }
+                    },
+                    {
+                        data: 'status',
+                        render: function(data) {
+                            if (data == 1) {
+                                return '<span class="badge bg-success">Active</span>'
+                            }
+                            if (data == 0) {
+                                return '<span class="badge bg-danger">Banned</span>'
+                            }
+                        }
+                    },
+                    {
                         data: 'created_at',
-                        name: 'created_at'
+                        name: 'created_at',
+                        render: function(data) {
+                            return moment(data).format('dddd, DD MMMM YYYY HH:mm');
+                        }
                     },
                     {
                         data: 'id',
                         render: function(data) {
-                            return '<button class="btn btn-xs btn-primary mr-2" onclick="showQr">Details</button><button class="btn btn-xs btn-danger" onclick="showQr">Delete</button>';
+                            var id = data;
+                            return '<a href="/users/detail/' + id +
+                                '"><button class="btn btn-xs btn-primary mr-2">Details</button></a>';
                         }
                     }
                 ]
